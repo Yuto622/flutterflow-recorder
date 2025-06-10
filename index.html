@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+  <button onclick="startRecording()" style="font-size: 24px;">🎙️ Record 5s</button>
+  <script>
+    let recorder, stream;
+    async function startRecording() {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recorder = new MediaRecorder(stream);
+      let chunks = [];
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('file', blob, 'recording.webm');
+
+        await fetch("https://hook.us2.make.com/1ckmgl2q6zcgtam2ytn4cszpyk3ioxpg", {
+          method: "POST",
+          body: formData
+        });
+
+        alert("送信完了！");
+      };
+      recorder.start();
+      setTimeout(() => recorder.stop(), 5000);
+    }
+  </script>
+</body>
+</html>
 
